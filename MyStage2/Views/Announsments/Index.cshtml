@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="widsth=device-widsth, initial-scale=1, shrink-to-fit=no">
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
@@ -14,12 +14,14 @@
 <div class="container">
 
     <div class="container row">
-        <select id="listUsers" asp-items="Model.Users" onchange="filter()" ><option>Все</option></select>
-        <input type="date" id="fromDate"  onchange="filter()"/>
+        <select id="listUsers" asp-items="Model.Users" onchange="filter()">
+            <option>Все</option>
+        </select>
+        <input type="date" id="fromDate" onchange="filter()"/>
         <input type="date" id="toDate" onchange="filter()"/>
         <input type="search" id="searchBox" onkeyup="filter()"/>
     </div>
-    
+
     <table id="table"
            data-toggle="table"
            data-locale="ru-RU"
@@ -27,7 +29,9 @@
            data-show-columns-toggle-all="true"
            data-url="/Announsments/GetAnnounsmentsJson"
            data-checkbox-header="true"
-           >
+           data-height="500"
+           data-ids-field="id"
+           data-select-item-name="id">
 
         <thead>
         <tr>
@@ -42,48 +46,97 @@
         </thead>
 
     </table>
-    <div>
-        <button  onclick="setCountRowsOnPage(10)" >10</button>
-        <button  onclick="setCountRowsOnPage(50)" >50</button>
-        <button  onclick="setCountRowsOnPage(100)" >100</button>
+    <div id="removeButtonDiv">
+        <button class="btn btn-primary d-block ml-auto" style="margin: 10px" onclick="removeAnnounsments()">Удалить</button>
     </div>
 
+    <div>
+        <button onclick="setCountRowsOnPage(10)">10</button>
+        <button onclick="setCountRowsOnPage(50)">50</button>
+        <button onclick="setCountRowsOnPage(100)">100</button>
+    </div>
 </div>
 
-<script src="~/lib/jquery/dist/jquery.min.js" ></script>
-<script src="~/lib/popper.js" ></script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/popper.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script src="~/lib/bootstrap-table.js"></script>
 <script src="~/lib/bootstrap-table-ru-RU.min.js"></script>
 
 <script>
 
+    $(document).ready(function () {
+        $('.fixed-table-pagination').before($('#removeButtonDiv'));
+
+        $('#removeButtonDiv').hide();
+        
+        $('#table').on("check.bs.table check-all.bs.table ",
+            function () {
+
+                $('#removeButtonDiv').show();
+            });
 
 
-        function filter() {
-            var searchString = $('#searchBox').val();
-            var fromDate = $('#fromDate').val();
-            var toDate = $('#toDate').val();
-            var selectedUserId = $('#listUsers').val();
+        $('#table').on("uncheck.bs.table uncheck-all.bs.table",
+            function () {
+                $('#removeButtonDiv').hide();
+            });
 
-            var url = '/Announsments/GetAnnounsmentsJson?searchString=' + searchString +
-                    '&' + 'fromDate=' + fromDate +
-                    '&' + 'toDate=' + toDate +
-                    '&' + 'selectedUserId=' + selectedUserId
+    });
 
-            
-            $('#table').bootstrapTable('refresh', {
+    function filter() {
+        var searchString = $('#searchBox').val();
+        var fromDate = $('#fromDate').val();
+        var toDate = $('#toDate').val();
+        var selectedUserId = $('#listUsers').val();
+
+        var url = '/Announsments/GetAnnounsmentsJson?searchString=' + searchString + 
+            '&' +
+            'fromDate=' +
+            fromDate +
+            '&' +
+            'toDate=' +
+            toDate +
+            '&' +
+            'selectedUserId=' +
+            selectedUserId;
+
+
+        $('#table').bootstrapTable('refresh',
+            {
                 url: url
             });
     }
 
 
     function setCountRowsOnPage(count) {
-        $('#table').bootstrapTable('refresh', {
+        $('#table').bootstrapTable('refresh',
+            {
                 pageSize: count
             });
     }
 
-    </script>
+
+    function removeAnnounsments() {
+
+        var selectedRows = $('#table').bootstrapTable('getSelections');
+
+        var ids = selectedRows.map(function(row) {
+            return row.id;
+        });
+
+        if (confirm(" Удалить записи  " + ids.length)) {
+
+            $.ajax({
+                url: "/Announsments/Delete",
+                type: "POST",
+                data: { ids: ids },
+                success: $('#table').bootstrapTable('remove', { field: 'id', values: ids })
+            });
+
+        }
+    }
+
+</script>
 </body>
 </html>

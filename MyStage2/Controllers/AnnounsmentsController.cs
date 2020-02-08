@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyStage2.Data;
-using MyStage2.Models;
 using MyStage2.ViewModels;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MyStage2.Controllers
 {
@@ -21,7 +19,7 @@ namespace MyStage2.Controllers
         }
 
         // GET: Announsments
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             var viewModel = new AnnounsmentsVM
             {
@@ -30,77 +28,59 @@ namespace MyStage2.Controllers
             return View(viewModel);
         }
 
-        public JsonResult GetAnnounsmentsJson(string searchString, int selectedUserId, string fromDate, string toDate)
+        public async Task<IActionResult> GetAnnounsmentsJson(string searchString, int selectedUserId, DateTime? fromDate, DateTime? toDate)
         {
-            if (_context.Announsment.Count()==0)
+            if (!await _context.Announsment.AnyAsync())
             {
-                _context.Users.Add(new User
+                for (var i = 0; i < 100; i++)
                 {
-                    FirstName="firstname",
-                    LastName="Lastname"
-                });
-                _context.SaveChanges();
+                    var ann = TestDataGenerator.GenerateAnnounsment();
 
-                for (int i = 0; i < 100; i++)
-                {
-                    _context.Announsment.Add(new Announsment
-                    {
-                        Number = 1,
-                        Rating = 1,
-                        TextAnnounsment = "text",
-                        CreateDate = DateTime.Now,
-                        User = _context.Users.First()
-
-                    });
+                    _context.Announsment.Add(ann);
                 }
-                _context.SaveChanges();
 
+                _context.SaveChanges();
             }
 
 
             var announsments = _context.Announsment.Include(u => u.User).AsQueryable();
 
-            if (!string.IsNullOrEmpty(fromDate))
-            {
-                DateTime _fromDate = Convert.ToDateTime(fromDate);
+            if (fromDate.HasValue) announsments = announsments.Where(a => a.CreateDate >= fromDate);
 
-                announsments = announsments.Where(a => a.CreateDate >= _fromDate);
-
-            }
-
-            if (!string.IsNullOrEmpty(toDate))
-            {
-                DateTime _toDate = Convert.ToDateTime(toDate);
-
-                announsments = announsments.Where(a => a.CreateDate <= _toDate);
-
-            }
-
+            if (toDate.HasValue) announsments = announsments.Where(a => a.CreateDate <= toDate);
 
 
             if (!string.IsNullOrEmpty(searchString))
             {
                 announsments = announsments
-                                                   .Where(u => u.Id.ToString()
-                                                  .Contains(searchString) ||
-                                                  u.TextAnnounsment.Contains(searchString) ||
-                                                  u.User.FirstName.Contains(searchString)  ||
-                                                  u.User.LastName.Contains(searchString)
-
-                                                  );
+                    .Where(u => u.Id.ToString()
+                                    .Contains(searchString) ||
+                                u.TextAnnounsment.Contains(searchString) ||
+                                u.User.FirstName.Contains(searchString) ||
+                                u.User.LastName.Contains(searchString) ||
+                                u.Rating.ToString().Contains(searchString)
+                    );
             }
 
-            if (selectedUserId != 0)
-            {
-                announsments = announsments.Where(a => a.User.Id == selectedUserId);
-            }
+            if (selectedUserId != 0) announsments = announsments.Where(a => a.User.Id == selectedUserId);
 
-                return new JsonResult(announsments.ToList());
-
+            return new JsonResult(await announsments.ToListAsync());
         }
 
 
+        public async Task<IActionResult> Delete(int[] ids)
+        {
+            if (ids == null) return RedirectToAction(nameof(Index));
+
+            var entities = _context.Announsment.Where(a => ids.Contains(a.Id));
+
+            if (!entities.Any()) return RedirectToAction(nameof(Index));
+
+            _context.Announsment.RemoveRange(entities);
+            await _context.SaveChangesAsync();
 
 
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

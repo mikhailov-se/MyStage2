@@ -3884,7 +3884,7 @@
 
 	      this.$pagination = this.$container.find('.fixed-table-pagination');
 	      this.$tableBody.append(this.$el);
-	      this.$container.after('<div class="clearfix"></div>');
+	      //this.$container.after('<div class="clearfix"></div>');
 	      this.$el.addClass(this.options.classes);
 	      this.$tableLoading.addClass(this.options.classes);
 
@@ -4317,7 +4317,7 @@
 	        //html.push(this.constants.html.toolbarDropdown[1], '</div>');
 	      }
 
-	      html.push('</div>'); // Fix #188: this.showToolbar is for extensions
+	      //html.push('</div>'); // Fix #188: this.showToolbar is for extensions
 
 	      if (this.showToolbar || html.length > 2) {
 	        this.$toolbar.append(html.join(''));
