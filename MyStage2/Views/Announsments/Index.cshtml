@@ -1,4 +1,7 @@
 ﻿@model MyStage2.ViewModels.AnnounsmentsVM
+@{
+    Layout = null;
+}
 <!doctype html>
 <html lang="en">
 <head>
@@ -17,9 +20,9 @@
         <select id="listUsers" asp-items="Model.Users" onchange="filter()">
             <option>Все</option>
         </select>
-        <input type="date" id="fromDate" onchange="filter()"/>
-        <input type="date" id="toDate" onchange="filter()"/>
-        <input type="search" id="searchBox" onkeyup="filter()"/>
+        <input type="date" id="fromDate" onchange="filter()" />
+        <input type="date" id="toDate" onchange="filter()" />
+        <input type="search" id="searchBox" onkeyup="filter()" />
     </div>
 
     <table id="table"
@@ -29,24 +32,23 @@
            data-show-columns-toggle-all="true"
            data-url="/Announsments/GetAnnounsmentsJson"
            data-checkbox-header="true"
-           data-height="500"
-           data-ids-field="id"
-           data-select-item-name="id">
+           data-height="600">
 
         <thead>
         <tr>
             <th data-checkbox="true"></th>
-            <th checkbox="true" data-sortable="true" data-field="id">ID</th>
-            <th data-sortable="true" data-field="number">Number</th>
-            <th data-sortable="true" data-field="rating">Rating</th>
-            <th data-sortable="true" data-field="textAnnounsment">TextAnnounsment</th>
-            <th data-sortable="true" data-field="createDate">createDate</th>
-            <th data-sortable="true" data-field="user.firstName">user</th>
+            <th data-sortable="true" data-field="id" >ID</th>
+            <th checkbox="true" data-sortable="true" data-field="number">Номер</th>
+            <th data-sortable="true"  data-field="createDate">Создано</th>
+            <th data-sortable="true" data-field="textAnnounsment">Объявление</th>
+            <th data-sortable="true" data-field="rating">Рейтинг</th>
+            <th data-sortable="true" data-field="userName">Пользователь</th>
         </tr>
         </thead>
 
     </table>
-    <div id="removeButtonDiv">
+
+    <div id="removeButtonDiv" on>
         <button class="btn btn-primary d-block ml-auto" style="margin: 10px" onclick="removeAnnounsments()">Удалить</button>
     </div>
 
@@ -57,19 +59,33 @@
     </div>
 </div>
 
+
+
+<!-- Modal placeholder -->
+<div id="modal-placeholder"  ></div>
+
+
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/popper.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script src="~/lib/bootstrap-table.js"></script>
 <script src="~/lib/bootstrap-table-ru-RU.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
 
 <script>
 
+   
     $(document).ready(function () {
+
+        $("#modal-placeholder").on("hidden.bs.modal", function () {
+            filter();
+        });
+
         $('.fixed-table-pagination').before($('#removeButtonDiv'));
 
         $('#removeButtonDiv').hide();
-        
+
         $('#table').on("check.bs.table check-all.bs.table ",
             function () {
 
@@ -82,7 +98,23 @@
                 $('#removeButtonDiv').hide();
             });
 
+        $('#table').on("dbl-click-row.bs.table",
+            function (row, $element) {
+                showModalEdit($element.id);
+            });
     });
+
+
+    function showModalEdit(announsmentId) {
+        var placeholderElement = $('#modal-placeholder');
+
+
+        $.ajax('/Announsments/Edit/'+announsmentId).done(function(data) {
+            placeholderElement.html(data);
+            placeholderElement.find('.modal').modal('show');
+        });
+    }
+
 
     function filter() {
         var searchString = $('#searchBox').val();
@@ -90,7 +122,7 @@
         var toDate = $('#toDate').val();
         var selectedUserId = $('#listUsers').val();
 
-        var url = '/Announsments/GetAnnounsmentsJson?searchString=' + searchString + 
+        var url = '/Announsments/GetAnnounsmentsJson?searchString=' + searchString +
             '&' +
             'fromDate=' +
             fromDate +
@@ -121,7 +153,7 @@
 
         var selectedRows = $('#table').bootstrapTable('getSelections');
 
-        var ids = selectedRows.map(function(row) {
+        var ids = selectedRows.map(function (row) {
             return row.id;
         });
 
@@ -133,10 +165,15 @@
                 data: { ids: ids },
                 success: $('#table').bootstrapTable('remove', { field: 'id', values: ids })
             });
-
         }
     }
 
 </script>
 </body>
 </html>
+
+<style>
+    .modal-dialog {
+        max-width: 60%;
+    }
+</style>

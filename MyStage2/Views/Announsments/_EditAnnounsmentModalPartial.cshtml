@@ -1,0 +1,98 @@
+﻿@model MyStage2.ViewModels.EditAnnounsmentVm
+
+<link rel="stylesheet" media="screen" href="css/styles.css">
+<div class="modal fade  bd-example-modal-lg " id="editAnnounsment" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog  bd-example-modal-lg " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addContactLabel">Объявление</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <form id="UpdateAnnounsment"  class="editAnnounsmentForm" asp-action="UpdateAnnounsment" name="UpdateAnnounsment">
+                    <ul>
+                        <li>
+                            <span class="required_notification"></span>
+                        </li>
+                        <li>
+                            <input asp-for="Announsment.Id" hidden="hidden" class="form-control"/>
+                        </li>
+                        <li>
+                            <label asp-for="Announsment.Number" class="control-label"></label>
+                            <input asp-for="Announsment.Number" class="form-control"/>
+                            <span asp-validation-for="Announsment.Number" class="text-danger"></span>
+                        </li>
+                        <li>
+                            <label asp-for="Announsment.CreateDate" class="control-label"></label>
+                            <input asp-for="Announsment.CreateDate" class="form-control"/>
+                            <span asp-validation-for="Announsment.CreateDate" class="text-danger"></span>
+                        </li>
+                        <li>
+                            <label class="control-label"></label>
+
+                            <select asp-for="SelectedUserId" asp-items="Model.Users"></select>
+
+                            <span asp-validation-for="Users" class="text-danger"></span>
+
+                        </li>
+
+                        <li>
+                        <label>Текст</label>
+                        <textarea asp-for="Announsment.TextAnnounsment" rows="10" required></textarea>
+                        <span asp-validation-for="Announsment.TextAnnounsment" class="text-danger"></span>
+                        <li/>
+
+                        <li>
+                            <label>Рейтинг</label>
+                            <input asp-for="Announsment.Rating"/>
+                        </li>
+
+                    </ul>
+
+                </form>
+
+            </div>
+
+            <div class="modal-footer" style="display: block">
+                <button class="btn btn-secondary" data-dismiss="modal" style="float: left" onclick="removeAnnounsment(@Model.Announsment.Id);">Удалить</button>
+                <button class="btn btn-secondary" data-dismiss="modal" style="float: right">Отменить</button>
+                <button type="submit" class="btn btn-primary" data-save="modal" style="float: right" onclick="$('#UpdateAnnounsment').submit();">Сохранить</button>
+            </div>
+
+
+        </div>
+
+    </div>
+    
+
+    <script>
+
+        function removeAnnounsment(id) {
+
+            if (confirm(" Удалить записи  ")) {
+
+                $.ajax({
+                    url: "/Announsments/Delete",
+                    type: "POST",
+                    data: { ids: id }
+
+                });
+                $('#table').bootstrapTable('remove', { field: 'id', values: id });
+                $('#table').bootstrapTable('refresh',
+                    {
+                        url: '/Announsments/GetAnnounsmentsJson'
+                    });
+            }
+
+        }
+    </script>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

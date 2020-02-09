@@ -11,13 +11,12 @@ namespace MyStage2.Data
 {
     public class Context : DbContext
     {
-        public Context (DbContextOptions<Context> options)
+        public Context(DbContextOptions<Context> options)
             : base(options)
         {
+        }
 
-            }
-
-        public DbSet<MyStage2.Models.Announsment> Announsment { get; set; }
-        public DbSet<MyStage2.Models.User> Users { get;  set; }
+        public DbSet<Announsment> Announsment { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }
