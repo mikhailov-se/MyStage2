@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.EntityFrameworkCore;
 using MyStage2.Data;
 using MyStage2.ViewModels;
@@ -16,6 +17,18 @@ namespace MyStage2.Controllers
         public AnnounsmentsController(Context context)
         {
             _context = context;
+
+            if (!_context.Announsment.Any())
+            {
+                for (int i = 0; i < 400; i++)
+                {
+                    var announsment = Data.TestDataGenerator.GenerateAnnounsment();
+                    _context.Announsment.Add(announsment);
+                }
+
+                _context.SaveChanges();
+            }
+
         }
 
         // GET: Announsments
