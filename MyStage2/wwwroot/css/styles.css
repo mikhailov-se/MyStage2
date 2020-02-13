@@ -33,55 +33,16 @@
 	display: inline-block;
 	float: left;
 	padding: 3px;
+    color: #4200be;
+    font-size: 35px;
 }
 
-.editAnnounsmentForm input {
 
-	width: 20%;
-}
 
-.editAnnounsmentForm textarea {
-	padding: 8px;
-	width: 60%;
 
-}
-
-/*.editAnnounsmentForm button {
-	margin-left: 156px;
-}*/
-
-/* form element visual styles */
-.editAnnounsmentForm input, .editAnnounsmentForm textarea {
-	border: 1px solid #aaa;
-	box-shadow: 0px 0px 3px #ccc, 0 10px 15px #eee inset;
-	border-radius: 2px;
-	padding-right: 30px;
-	-moz-transition: padding .25s;
-	-webkit-transition: padding .25s;
-	-o-transition: padding .25s;
-	transition: padding .25s;
-}
-
-	.editAnnounsmentForm input:focus, .editAnnounsmentForm textarea:focus {
-		background: #fff;
-		border: 1px solid #555;
-		box-shadow: 0 0 3px #aaa;
-		padding-right: 70px;
-	}
-
-	/* === HTML5 validation styles === */
-	.editAnnounsmentForm input:required, .editAnnounsmentForm textarea:required {
-		background: #fff url(images/red_asterisk.png) no-repeat 98% center;
-	}
-
-		.editAnnounsmentForm input:required:valid, .editAnnounsmentForm textarea:required:valid {
-			background: #fff url(images/valid.png) no-repeat 98% center;
-			box-shadow: 0 0 5px #5cd053;
-			border-color: #28921f;
-		}
 
 	.editAnnounsmentForm input:focus:invalid, .editAnnounsmentForm textarea:focus:invalid {
-		background: #fff url(images/invalid.png) no-repeat 98% center;
+		background: #fff ;
 		box-shadow: 0 0 5px #d45252;
 		border-color: #b03535
 	}
@@ -114,11 +75,3 @@
 	background: #28921f;
 }
 
-	.editAnnounsmentForm input:required:valid + .form_hint::before {
-		color: #28921f;
-	}
-
-
-/*.modal-footer {
-	justify-content: left
-}*/

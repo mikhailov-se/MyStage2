@@ -5,49 +5,51 @@
     <div class="modal-dialog  bd-example-modal-lg " role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addContactLabel">Объявление</h5>
+                <h5 class="modal-title" id="EditOrAddAnnounsmentLabel">Объявление</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
 
-                <form id="UpdateAnnounsment"  class="editAnnounsmentForm" asp-action="UpdateAnnounsment" name="UpdateAnnounsment">
+                <form id="UpdateAnnounsment"  class="editAnnounsmentForm " asp-action="UpdateAnnounsment" name="UpdateAnnounsment" style="text-align: left">
                     <ul>
+                       
                         <li>
-                            <span class="required_notification"></span>
+                            <input asp-for="Announsment.Id" style="visibility: hidden" class="form-control"/>
                         </li>
                         <li>
-                            <input asp-for="Announsment.Id" hidden="hidden" class="form-control"/>
-                        </li>
-                        <li>
-                            <label asp-for="Announsment.Number" class="control-label"></label>
+                            <label class="control-label">Номер</label>
                             <input asp-for="Announsment.Number" class="form-control"/>
                             <span asp-validation-for="Announsment.Number" class="text-danger"></span>
                         </li>
                         <li>
-                            <label asp-for="Announsment.CreateDate" class="control-label"></label>
+                            <label class="control-label">Создано</label>
                             <input asp-for="Announsment.CreateDate" class="form-control"/>
                             <span asp-validation-for="Announsment.CreateDate" class="text-danger"></span>
                         </li>
                         <li>
-                            <label class="control-label"></label>
+                            <label class="control-label">Пользователь</label>
 
-                            <select asp-for="SelectedUserId" asp-items="Model.Users"></select>
+                            <select  asp-for="SelectedUserId" asp-items="Model.Users"></select>
 
                             <span asp-validation-for="Users" class="text-danger"></span>
 
                         </li>
 
                         <li>
-                        <label>Текст</label>
+                        <label class="control-label">Текст</label>
                         <textarea asp-for="Announsment.TextAnnounsment" rows="10" required></textarea>
                         <span asp-validation-for="Announsment.TextAnnounsment" class="text-danger"></span>
                         <li/>
 
                         <li>
-                            <label>Рейтинг</label>
-                            <input asp-for="Announsment.Rating"/>
+                            <div class="row">
+                                <label class="control-label">Рейтинг</label>
+                                <input asp-for="Announsment.Rating" style="width: 50px" />
+                                
+                                <label>от 1 до 10</label>
+                            </div>
                         </li>
 
                     </ul>
@@ -90,6 +92,47 @@
         }
     </script>
 </div>
+
+<style>
+
+    .editAnnounsmentForm {
+        color: black;
+        margin-left: 5%;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    #EditOrAddAnnounsmentLabel {
+        color: #4200be;
+        font-size: 35px;
+    }
+
+    .editAnnounsmentForm input,  .editAnnounsmentForm select {
+        border: 2px solid blue;
+        border-radius: 5px;
+        width: 200px;
+        padding: 6px;
+        text-align: left;
+        box-shadow: none;
+    }
+
+    .editAnnounsmentForm textarea {
+        width: 60%;
+    }
+
+    .editAnnounsmentForm li {
+        padding: 7px;
+    }
+
+
+    .editAnnounsmentForm input:required:valid, .editAnnounsmentForm textarea:required:valid {
+        background: #fff;
+        box-shadow: 0 0 1px blue;
+        border-color: blue;
+    }
+
+
+</style>
 
 
 @section Scripts {

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace MyStage2.ViewModels
 {
-    public class AnnounsmentsVM
+    public class AnnounsmentsVm
     {
         public List<SelectListItem> Users { get; set; }
     }

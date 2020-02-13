@@ -34,7 +34,7 @@ namespace MyStage2.Controllers
         // GET: Announsments
         public async Task<IActionResult> Index()
         {
-            var viewModel = new AnnounsmentsVM
+            var viewModel = new AnnounsmentsVm
             {
                 Users = await _context.Users
                     .Select(user => new SelectListItem(user.FirstName + " " + user.LastName, user.Id.ToString()))
