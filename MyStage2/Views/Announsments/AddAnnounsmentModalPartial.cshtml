@@ -5,22 +5,22 @@
     <div class="modal-dialog  bd-example-modal-lg " role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="EditOrAddAnnounsmentLabel">Объявление</h5>
+                <h5 class="modal-title" id="EditOrAddAnnounsmentLabel"> Добавить объявление</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
 
-                <form id="UpdateAnnounsment"  class="editAnnounsmentForm " asp-action="UpdateAnnounsment" name="UpdateAnnounsment" style="text-align: left">
+                <form id="AddAnnounsment" class="AddAnnounsment " asp-action="AddAnnounsment" name="AddAnnounsment" style="text-align: left">
                     <ul>
-                       
+
                         <li>
-                            <input asp-for="Announsment.Id" style="visibility: hidden" class="form-control"/>
+                            <input asp-for="Announsment.Id" style="visibility: hidden" class="form-control" />
                         </li>
                         <li>
                             <label class="control-label">Номер</label>
-                            <input asp-for="Announsment.Number" class="form-control"/>
+                            <input asp-for="Announsment.Number" class="form-control" />
                             <span asp-validation-for="Announsment.Number" class="text-danger"></span>
                         </li>
                         <li>
@@ -31,23 +31,23 @@
                         <li>
                             <label class="control-label">Пользователь</label>
 
-                            <select  asp-for="SelectedUserId" asp-items="Model.Users"></select>
+                            <select asp-for="SelectedUserId" asp-items="Model.Users"></select>
 
                             <span asp-validation-for="Users" class="text-danger"></span>
 
                         </li>
 
                         <li>
-                        <label class="control-label">Текст</label>
-                        <textarea asp-for="Announsment.TextAnnounsment" rows="10" required></textarea>
-                        <span asp-validation-for="Announsment.TextAnnounsment" class="text-danger"></span>
-                        <li/>
+                            <label class="control-label">Текст</label>
+                            <textarea asp-for="Announsment.TextAnnounsment" rows="10" required></textarea>
+                            <span asp-validation-for="Announsment.TextAnnounsment" class="text-danger"></span>
+                        <li />
 
                         <li>
                             <div class="row">
                                 <label class="control-label">Рейтинг</label>
                                 <input asp-for="Announsment.Rating" style="width: 50px" />
-                                
+
                                 <label>от 1 до 10</label>
                             </div>
                         </li>
@@ -59,16 +59,15 @@
             </div>
 
             <div class="modal-footer" style="display: block">
-                <button class="btn btn-secondary" data-dismiss="modal" style="float: left" onclick="removeAnnounsment(@Model.Announsment.Id);">Удалить</button>
                 <button class="btn btn-secondary" data-dismiss="modal" style="float: right">Отменить</button>
-                <button type="submit" class="btn btn-primary" data-save="modal" style="float: right" onclick="$('#UpdateAnnounsment').submit();">Сохранить</button>
+                <button type="submit" class="btn btn-primary" data-save="modal" style="float: right" onclick="$('#AddAnnounsment').submit();">Добавить</button>
             </div>
 
 
         </div>
 
     </div>
-    
+
 
     <script>
 
@@ -102,24 +101,12 @@
         font-weight: 600;
     }
 
-    .editAnnounsmentForm label {
-        width: 150px;
-        margin-top: 3px;
-        display: inline-block;
-        float: left;
-        padding: 3px;
-        color: #4200be;
-        font-size: 20px;
-    }
-
-    .modal-title {
-        margin-bottom: 0;
-        line-height: 1.5;
+    #EditOrAddAnnounsmentLabel {
         color: #4200be;
         font-size: 35px;
     }
 
-    .editAnnounsmentForm input,  .editAnnounsmentForm select {
+    .editAnnounsmentForm input, .editAnnounsmentForm select {
         border: 2px solid blue;
         border-radius: 5px;
         width: 200px;
@@ -142,8 +129,6 @@
         box-shadow: 0 0 1px blue;
         border-color: blue;
     }
-
-
 </style>
 
 

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.EntityFrameworkCore;
 using MyStage2.Data;
+using MyStage2.Models;
 using MyStage2.ViewModels;
 
 namespace MyStage2.Controllers
@@ -96,7 +98,7 @@ namespace MyStage2.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> GetModalEditAnnounsment(int? id)
         {
             if (id == null) return NotFound();
 
@@ -138,5 +140,36 @@ namespace MyStage2.Controllers
 
             return RedirectToAction("Index");
         }
+
+
+        [HttpGet]
+
+        public async Task<IActionResult> GetModalAddAnnounsment()
+        {
+
+            var announsmentVm = new EditAnnounsmentVm
+            {
+                Announsment = new Announsment(),
+                Users = await _context.Users
+                    .Select(user => new SelectListItem(user.FirstName + " " + user.LastName, user.Id.ToString()))
+                    .ToListAsync()
+            };
+            return PartialView("AddAnnounsmentModalPartial", announsmentVm);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> AddAnnounsment(EditAnnounsmentVm announsmentVm)
+        {
+            announsmentVm.Announsment.User = await _context.Users.FindAsync(announsmentVm.SelectedUserId);
+
+
+            await _context.Announsment.AddAsync(announsmentVm.Announsment);
+            await _context.SaveChangesAsync();
+
+
+            return RedirectToAction("Index");
+        }
+
     }
 }

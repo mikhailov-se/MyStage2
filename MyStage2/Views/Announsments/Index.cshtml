@@ -11,11 +11,11 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
     <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
 </head>
 <body>
 
     <div class="container container-fluid">
-
 
         <table id="table"
                class="table "
@@ -30,18 +30,18 @@
                data-show-header="true"
                data-click-to-select="true">
 
-            <thead style="background-color: #4200be;  ">
+            <thead style="background-color: #4200be;">
 
 
                 <div id="searchDiv">
-                    <button class="searchControl" style="background: white; width: 130px; border-radius: 50px;">Добавить</button>
+                    <button onclick="showModalAdd();" class="searchControl" style="background: white; width: 130px; border-radius: 50px;">Добавить</button>
                     <label>Пользователь</label>
                     <select class="searchControl" id="listUsers" asp-items="Model.Users" onchange="filter()" style="border-radius: 5px;">
                         <option>Все</option>
                     </select>
                     <label>От</label>
-                    <input class="searchControl" type="date" id="fromDate" onchange="filter()" style="border-radius: 5px;" />
-
+                    <input class="searchControl" type="date" id="fromDate" onchange="filter()" style="border-radius: 5px; " />
+                    <i class="fas fa-calendar searchControl" ></i>
                     <label>До</label>
                     <input class="searchControl" type="date" id="toDate" onchange="filter()" style="border-radius: 5px;" />
 
@@ -66,9 +66,9 @@
 
         <div id="setCountOfRowsButtonsDiv">
             <label>Количество строк на таблице</label>
-            <button class="setCountOnPageButton" onclick="setCountRowsOnPage(this,10)">10</button>
-            <button class="setCountOnPageButton" onclick="setCountRowsOnPage(this,50)">50</button>
-            <button class="setCountOnPageButton" onclick="setCountRowsOnPage(this,100)">100</button>
+            <button class="setCountOnPageButton" onclick="setCountRowsOnPage(this, 10)">10</button>
+            <button class="setCountOnPageButton" onclick="setCountRowsOnPage(this, 50)">50</button>
+            <button class="setCountOnPageButton" onclick="setCountRowsOnPage(this, 100)">100</button>
         </div>
 
         <div id="removeButtonDiv">
@@ -86,6 +86,8 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script src="~/lib/bootstrap-table.js"></script>
     <script src="~/lib/bootstrap-table-ru-RU.min.js"></script>
+<script src="https://use.fontawesome.com/releases/v5.12.1/js/all.js" data-auto-replace-svg="nest"></script>
+
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
     </script>
 
@@ -129,7 +131,7 @@
             var placeholderElement = $('#modal-placeholder');
 
 
-            $.ajax('/Announsments/Edit/' + announsmentId).done(function (data) {
+            $.ajax('/Announsments/GetModalEditAnnounsment/' + announsmentId).done(function (data) {
                 placeholderElement.html(data);
                 placeholderElement.find('.modal').modal('show');
             });
@@ -208,10 +210,18 @@
 
         }
 
+
+        function showModalAdd() {
+            var placeholderElement = $('#modal-placeholder');
+
+
+            $.ajax('/Announsments/GetModalAddAnnounsment/').done(function (data) {
+                placeholderElement.html(data);
+                placeholderElement.find('.modal').modal('show');
+            });
+        }
+
     </script>
-
-
-
 
 
 </body>
