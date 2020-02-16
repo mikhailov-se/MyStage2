@@ -11,9 +11,11 @@
                 </button>
             </div>
 
-            <div class="modal-body">
+            <form id="UpdateAnnounsment" class="editAnnounsmentForm " asp-action="UpdateAnnounsment" name="UpdateAnnounsment" style="text-align: left">
 
-                <form id="UpdateAnnounsment" class="editAnnounsmentForm " asp-action="UpdateAnnounsment" name="UpdateAnnounsment" style="text-align: left">
+
+                <div class="modal-body">
+
                     <ul>
 
                         <li style="height: 1px">
@@ -39,7 +41,7 @@
                         </li>
 
                         <li>
-                            <label class="control-label" style="width: 70px">Текст</label>
+                            <label class="control-label" style="width: 80px">Текст</label>
                             <textarea asp-for="Announsment.TextAnnounsment" rows="10" required></textarea>
                             <span asp-validation-for="Announsment.TextAnnounsment" class="text-danger"></span>
                         <li />
@@ -48,6 +50,7 @@
                             <div class="row">
                                 <label class="control-label">Рейтинг</label>
                                 <input asp-for="Announsment.Rating" style="width: 50px" />
+                                <span class="text-danger" asp-validation-for="Announsment.Rating"></span>
 
                                 <label>от 1 до 10</label>
                             </div>
@@ -55,15 +58,15 @@
 
                     </ul>
 
-                </form>
 
-            </div>
+                </div>
 
-            <div class="modal-footer" style="display: block">
-                <button class="btn" data-dismiss="modal" style="float: left" onclick="removeAnnounsment(@Model.Announsment.Id);">Удалить</button>
-                <button class="btn" data-dismiss="modal" style="float: right">Отменить</button>
-                <button class="btn" style="float: right" onclick="sumbitForm()">Сохранить</button>
-            </div>
+                <div class="modal-footer" style="display: block; margin: 50px;" >
+                    <button class="btn" data-dismiss="modal" style="float: left" onclick="removeAnnounsment(@Model.Announsment.Id);">Удалить</button>
+                    <button class="btn" data-dismiss="modal" style="float: right">Отменить</button>
+                    <button class="btn" style="float: right" type="submit">Сохранить</button>
+                </div>
+            </form>
 
 
         </div>
@@ -73,6 +76,18 @@
     <script src="js/jquery.form.min.js"></script>
 
     <script>
+
+
+        $(document).ready(function () {
+
+            document.getElementById("UpdateAnnounsment").addEventListener('submit',
+                function (e) {
+                    e.preventDefault();
+                    sumbitForm();
+                });
+
+        });
+
 
         function sumbitForm() {
             $('#UpdateAnnounsment').ajaxSubmit({
@@ -114,6 +129,7 @@
             }
 
         }
+
     </script>
 </div>
 
@@ -171,6 +187,7 @@
 
     .editAnnounsmentForm textarea {
         width: 80%;
+        padding: 5px;
     }
 
     .editAnnounsmentForm li {

@@ -1,14 +1,12 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.EntityFrameworkCore;
 using MyStage2.Data;
 using MyStage2.Models;
 using MyStage2.ViewModels;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MyStage2.Controllers
 {
@@ -126,6 +124,10 @@ namespace MyStage2.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateAnnounsment(EditAnnounsmentVm announsmentVm)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
             try
             {
                 announsmentVm.Announsment.User = await _context.Users.FindAsync(announsmentVm.SelectedUserId);
@@ -161,6 +163,12 @@ namespace MyStage2.Controllers
         [HttpPost]
         public async Task<IActionResult> AddAnnounsment(EditAnnounsmentVm announsmentVm)
         {
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
             try
             {
                 announsmentVm.Announsment.User = await _context.Users.FindAsync(announsmentVm.SelectedUserId);

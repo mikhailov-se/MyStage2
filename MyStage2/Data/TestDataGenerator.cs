@@ -19,7 +19,7 @@ namespace MyStage2.Data
                 Number = faker.Random.Number(),
                 CreateDate = faker.Date.Soon(),
                 Rating = faker.Random.Number(10),
-                TextAnnounsment ="Text announsment",
+                TextAnnounsment ="Скоро состоится хакатон",
               
                 User =new User
                 {

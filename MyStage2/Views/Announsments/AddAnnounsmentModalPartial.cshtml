@@ -1,6 +1,11 @@
-﻿@model MyStage2.ViewModels.EditAnnounsmentVm
+﻿
+@model MyStage2.ViewModels.EditAnnounsmentVm
+
 
 <link rel="stylesheet" media="screen" href="css/styles.css">
+<link rel="stylesheet" href="https://jqueryvalidation.org/files/demo/site-demos.css">
+
+
 <div class="modal fade  bd-example-modal-lg " id="editAnnounsment" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog  bd-example-modal-lg " role="document">
         <div class="modal-content">
@@ -11,10 +16,13 @@
                 </button>
             </div>
 
+            <form id="AddAnnounsmentForm" class="AddAnnounsmentForm " asp-action="AddAnnounsment" name="AddAnnounsment" style="text-align: left">
 
-            <div class="modal-body">
+                <div class="modal-body">
 
-                <form id="AddAnnounsmentForm" class="AddAnnounsmentForm " asp-action="AddAnnounsment" name="AddAnnounsment" style="text-align: left">
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
                     <ul>
 
                         <li style="height: 1px">
@@ -22,12 +30,12 @@
                         </li>
                         <li>
                             <label class="control-label">Номер</label>
-                            <input asp-for="Announsment.Number" class="form-control" />
+                            <input asp-for="Announsment.Number" name="number" class="form-control" min="1" />
                             <span asp-validation-for="Announsment.Number" class="text-danger"></span>
                         </li>
                         <li>
                             <label class="control-label">Создано</label>
-                            <input asp-for="Announsment.CreateDate" class="form-control" />
+                            <input asp-for="Announsment.CreateDate" class="form-control" required="required"   />
                             <span asp-validation-for="Announsment.CreateDate" class="text-danger"></span>
                         </li>
                         <li>
@@ -41,14 +49,15 @@
 
                         <li>
                             <label class="control-label" style="width: 70px">Текст</label>
-                            <textarea asp-for="Announsment.TextAnnounsment" rows="10" required></textarea>
+                            <textarea class="re" asp-for="Announsment.TextAnnounsment" rows="10" required="required" data-val="true"></textarea>
+
                             <span asp-validation-for="Announsment.TextAnnounsment" class="text-danger"></span>
                         <li />
 
                         <li>
                             <div class="row">
                                 <label class="control-label">Рейтинг</label>
-                                <input asp-for="Announsment.Rating" style="width: 50px" />
+                                <input asp-for="Announsment.Rating" type="number" value="1" min="1" max="10" style="width: 50px" />
 
                                 <label>от 1 до 10</label>
                             </div>
@@ -56,14 +65,14 @@
 
                     </ul>
 
-                </form>
 
-            </div>
+                </div>
 
-            <div class="modal-footer" style="display: block">
-                <button class="btn " data-dismiss="modal" style="float: right">Отменить</button>
-                <button type="submit" class="btn" data-save="modal" style="float: right" onclick="sumbitForm()">Добавить</button>
-            </div>
+                <div class="modal-footer" style="display: block; margin: 50px">
+                    <button class="btn " data-dismiss="modal" style="float: right">Отменить</button>
+                    <button type="submit" class="btn" data-save="modal" style="float: right">Добавить</button>
+                </div>
+            </form>
 
 
         </div>
@@ -72,9 +81,22 @@
 
 </div>
 <script src="js/jquery.form.min.js"></script>
+
 <script>
 
+    $(document).ready(function () {
+
+        document.getElementById("AddAnnounsmentForm").addEventListener('submit',
+            function (e) {
+                e.preventDefault();
+                sumbitForm();
+            });
+
+    });
+
+
     function sumbitForm() {
+
         $('#AddAnnounsmentForm').ajaxSubmit({
             success: () => {
                 toastr.success('Запись успешно сохранена', "Успех");
@@ -86,14 +108,14 @@
             }
         });
 
-
-        function modalHide() {
-            var placeholderElement = $('#modal-placeholder');
-
-            placeholderElement.find('.modal').modal('hide');
-        }
-
     }
+
+    function modalHide() {
+        var placeholderElement = $('#modal-placeholder');
+
+        placeholderElement.find('.modal').modal('hide');
+    }
+
 
 </script>
 
@@ -122,16 +144,16 @@
         font-weight: 400;
     }
 
-    .AddAnnounsmentForm label {
-        width: 150px;
-        margin-top: 3px;
-        display: inline-block;
-        float: left;
-        padding: 3px;
-        color: black;
-        font-size: 16px;
-        font-weight: 500;
-    }
+        .AddAnnounsmentForm label {
+            width: 150px;
+            margin-top: 3px;
+            display: inline-block;
+            float: left;
+            padding: 3px;
+            color: black;
+            font-size: 16px;
+            font-weight: 500;
+        }
 
     .modal-title {
         margin-bottom: 0;
