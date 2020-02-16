@@ -10,17 +10,18 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
+
             <div class="modal-body">
 
-                <form id="UpdateAnnounsment"  class="editAnnounsmentForm " asp-action="UpdateAnnounsment" name="UpdateAnnounsment" style="text-align: left">
+                <form id="UpdateAnnounsment" class="editAnnounsmentForm " asp-action="UpdateAnnounsment" name="UpdateAnnounsment" style="text-align: left">
                     <ul>
-                       
-                        <li>
-                            <input asp-for="Announsment.Id" style="visibility: hidden" class="form-control"/>
+
+                        <li style="height: 1px">
+                            <input asp-for="Announsment.Id" style="visibility: hidden" class="form-control" />
                         </li>
                         <li>
                             <label class="control-label">Номер</label>
-                            <input asp-for="Announsment.Number" class="form-control"/>
+                            <input asp-for="Announsment.Number" class="form-control" />
                             <span asp-validation-for="Announsment.Number" class="text-danger"></span>
                         </li>
                         <li>
@@ -31,23 +32,23 @@
                         <li>
                             <label class="control-label">Пользователь</label>
 
-                            <select  asp-for="SelectedUserId" asp-items="Model.Users"></select>
+                            <select asp-for="SelectedUserId" asp-items="Model.Users"></select>
 
                             <span asp-validation-for="Users" class="text-danger"></span>
 
                         </li>
 
                         <li>
-                        <label class="control-label">Текст</label>
-                        <textarea asp-for="Announsment.TextAnnounsment" rows="10" required></textarea>
-                        <span asp-validation-for="Announsment.TextAnnounsment" class="text-danger"></span>
-                        <li/>
+                            <label class="control-label" style="width: 70px">Текст</label>
+                            <textarea asp-for="Announsment.TextAnnounsment" rows="10" required></textarea>
+                            <span asp-validation-for="Announsment.TextAnnounsment" class="text-danger"></span>
+                        <li />
 
                         <li>
                             <div class="row">
                                 <label class="control-label">Рейтинг</label>
                                 <input asp-for="Announsment.Rating" style="width: 50px" />
-                                
+
                                 <label>от 1 до 10</label>
                             </div>
                         </li>
@@ -59,18 +60,39 @@
             </div>
 
             <div class="modal-footer" style="display: block">
-                <button class="btn btn-secondary" data-dismiss="modal" style="float: left" onclick="removeAnnounsment(@Model.Announsment.Id);">Удалить</button>
-                <button class="btn btn-secondary" data-dismiss="modal" style="float: right">Отменить</button>
-                <button type="submit" class="btn btn-primary" data-save="modal" style="float: right" onclick="$('#UpdateAnnounsment').submit();">Сохранить</button>
+                <button class="btn" data-dismiss="modal" style="float: left" onclick="removeAnnounsment(@Model.Announsment.Id);">Удалить</button>
+                <button class="btn" data-dismiss="modal" style="float: right">Отменить</button>
+                <button class="btn" style="float: right" onclick="sumbitForm()">Сохранить</button>
             </div>
 
 
         </div>
 
     </div>
-    
+
+    <script src="js/jquery.form.min.js"></script>
 
     <script>
+
+        function sumbitForm() {
+            $('#UpdateAnnounsment').ajaxSubmit({
+                success: () => {
+                    toastr.success('Запись успешно сохранена', "Успех");
+                    modalHide();
+                },
+                error: () => {
+                    toastr.error('Внутреняя ошибка', "Ошибка");
+                    modalHide();
+                }
+            });
+
+        }
+
+        function modalHide() {
+            var placeholderElement = $('#modal-placeholder');
+
+            placeholderElement.find('.modal').modal('hide');
+        }
 
         function removeAnnounsment(id) {
 
@@ -79,7 +101,9 @@
                 $.ajax({
                     url: "/Announsments/Delete",
                     type: "POST",
-                    data: { ids: id }
+                    data: { ids: id },
+                    success: () => { toastr.success('Запись успешно удалена', "Успех"); },
+                    error: () => { toastr.error('Внутреняя ошибка', "Ошибка"); }
 
                 });
                 $('#table').bootstrapTable('remove', { field: 'id', values: id });
@@ -93,34 +117,51 @@
     </script>
 </div>
 
+
 <style>
+
+    .modal-footer button {
+        margin-right: 20px;
+        color: #4200be;
+        border-color: #4200be;
+        border-radius: 50px;
+        width: 150px;
+        font-weight: 500;
+    }
+
+    .modal-dialog {
+        max-width: 600px;
+        margin: 1.75rem auto;
+    }
 
     .editAnnounsmentForm {
         color: black;
         margin-left: 5%;
-        font-size: 16px;
-        font-weight: 600;
+        font-size: 14px;
+        font-weight: 400;
     }
 
-    .editAnnounsmentForm label {
-        width: 150px;
-        margin-top: 3px;
-        display: inline-block;
-        float: left;
-        padding: 3px;
-        color: #4200be;
-        font-size: 20px;
-    }
+        .editAnnounsmentForm label {
+            width: 150px;
+            margin-top: 3px;
+            display: inline-block;
+            float: left;
+            padding: 3px;
+            color: black;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
 
     .modal-title {
         margin-bottom: 0;
         line-height: 1.5;
         color: #4200be;
-        font-size: 35px;
+        font-size: 30px;
     }
 
-    .editAnnounsmentForm input,  .editAnnounsmentForm select {
-        border: 2px solid blue;
+    .editAnnounsmentForm input, .editAnnounsmentForm select {
+        border: 1px solid #4200be;
         border-radius: 5px;
         width: 200px;
         padding: 6px;
@@ -129,22 +170,24 @@
     }
 
     .editAnnounsmentForm textarea {
-        width: 60%;
+        width: 80%;
     }
 
     .editAnnounsmentForm li {
         padding: 7px;
+        list-style: none;
+        margin-top: 2px;
     }
 
 
     .editAnnounsmentForm input:required:valid, .editAnnounsmentForm textarea:required:valid {
         background: #fff;
-        box-shadow: 0 0 1px blue;
-        border-color: blue;
+        box-shadow: 0 0 1px black;
+        border-color: black;
     }
-
-
 </style>
+
+
 
 
 @section Scripts {

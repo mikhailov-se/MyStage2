@@ -83,11 +83,11 @@ namespace MyStage2.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int[] ids)
         {
-            if (ids.Length == 0) return RedirectToAction(nameof(Index));
+            if (ids.Length == 0) return NotFound();
 
             var entities = _context.Announsment.Where(a => ids.Contains(a.Id));
 
-            if (!entities.Any()) return RedirectToAction(nameof(Index));
+            if (!entities.Any()) return NotFound();
 
             _context.Announsment.RemoveRange(entities);
             await _context.SaveChangesAsync();
@@ -154,18 +154,24 @@ namespace MyStage2.Controllers
                     .Select(user => new SelectListItem(user.FirstName + " " + user.LastName, user.Id.ToString()))
                     .ToListAsync()
             };
-            return PartialView("AddAnnounsmentModalPartial", announsmentVm);
+            return  PartialView("AddAnnounsmentModalPartial", announsmentVm);
         }
 
 
         [HttpPost]
         public async Task<IActionResult> AddAnnounsment(EditAnnounsmentVm announsmentVm)
         {
-            announsmentVm.Announsment.User = await _context.Users.FindAsync(announsmentVm.SelectedUserId);
+            try
+            {
+                announsmentVm.Announsment.User = await _context.Users.FindAsync(announsmentVm.SelectedUserId);
 
-
-            await _context.Announsment.AddAsync(announsmentVm.Announsment);
-            await _context.SaveChangesAsync();
+                await _context.Announsment.AddAsync(announsmentVm.Announsment);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e);
+            }
 
 
             return RedirectToAction("Index");
