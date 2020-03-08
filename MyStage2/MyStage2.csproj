@@ -12,4 +12,15 @@
     <PackageReference Include="toastr" Version="2.1.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="wwwroot\js\bootstrap-table.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\js\bootstrap-table.min.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
