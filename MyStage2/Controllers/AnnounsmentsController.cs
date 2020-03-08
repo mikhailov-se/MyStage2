@@ -107,7 +107,7 @@ namespace MyStage2.Controllers
 
             if (announsment == null) return NotFound();
 
-            var announsmentVm = new EditAnnounsmentVm
+            var announsmentVm = new AnnounsmentsVm
             {
                 Announsment = announsment,
                 Users = await _context.Users
@@ -122,7 +122,7 @@ namespace MyStage2.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> UpdateAnnounsment(EditAnnounsmentVm announsmentVm)
+        public async Task<IActionResult> UpdateAnnounsment(AnnounsmentsVm announsmentVm)
         {
             if (!ModelState.IsValid)
             {
@@ -149,7 +149,7 @@ namespace MyStage2.Controllers
         public async Task<IActionResult> GetModalAddAnnounsment()
         {
 
-            var announsmentVm = new EditAnnounsmentVm
+            var announsmentVm = new AnnounsmentsVm
             {
                 Announsment = new Announsment(),
                 Users = await _context.Users
@@ -161,7 +161,7 @@ namespace MyStage2.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> AddAnnounsment(EditAnnounsmentVm announsmentVm)
+        public async Task<IActionResult> AddAnnounsment(AnnounsmentsVm announsmentVm)
         {
 
             if (!ModelState.IsValid)
