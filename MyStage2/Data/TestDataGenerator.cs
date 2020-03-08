@@ -16,7 +16,7 @@ namespace MyStage2.Data
 
             var announsment = new Models.Announsment
             {
-                Number = faker.Random.Number(),
+                Number = faker.Random.Number(1,400),
                 CreateDate = faker.Date.Soon(),
                 Rating = faker.Random.Number(10),
                 TextAnnounsment ="Скоро состоится хакатон",

@@ -18,11 +18,11 @@ namespace MyStage2.Controllers
         {
             _context = context;
 
-            if (!_context.Announsment.Any())
+            if (!_context.Announsment.Any()) // todo Remove
             {
                 for (int i = 0; i < 400; i++)
                 {
-                    var announsment = Data.TestDataGenerator.GenerateAnnounsment();
+                    var announsment = TestDataGenerator.GenerateAnnounsment();
                     _context.Announsment.Add(announsment);
                 }
 
@@ -54,12 +54,12 @@ namespace MyStage2.Controllers
 
             if (!string.IsNullOrEmpty(searchString))
                 announsments = announsments
-                    .Where(u => u.Id.ToString()
-                                    .Contains(searchString) ||
-                                u.TextAnnounsment.Contains(searchString) ||
-                                u.User.FirstName.Contains(searchString) ||
-                                u.User.LastName.Contains(searchString) ||
-                                u.Rating.ToString().Contains(searchString)
+                    .Where(u =>
+                        u.Number.ToString().ToLower().Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
+                        u.TextAnnounsment.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
+                        u.User.FirstName.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
+                        u.User.LastName.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
+                        u.Rating.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase)
                     );
 
             if (selectedUserId != 0) announsments = announsments.Where(a => a.User.Id == selectedUserId);
@@ -145,18 +145,26 @@ namespace MyStage2.Controllers
 
 
         [HttpGet]
-
         public async Task<IActionResult> GetModalAddAnnounsment()
         {
+            var maxNumber = await _context.Announsment.MaxAsync(a => a.Number);
+
+            var announsment = new Announsment
+            {
+                CreateDate = DateTime.Now,
+                Number = maxNumber + 1
+            };
+
+            var users = await _context.Users
+                .Select(user => new SelectListItem(user.FirstName + " " + user.LastName, user.Id.ToString()))
+                .ToListAsync();
 
             var announsmentVm = new AnnounsmentsVm
             {
-                Announsment = new Announsment(),
-                Users = await _context.Users
-                    .Select(user => new SelectListItem(user.FirstName + " " + user.LastName, user.Id.ToString()))
-                    .ToListAsync()
+                Announsment = announsment,
+                Users = users
             };
-            return  PartialView("AddAnnounsmentModalPartial", announsmentVm);
+            return PartialView("AddAnnounsmentModalPartial", announsmentVm);
         }
 
 
