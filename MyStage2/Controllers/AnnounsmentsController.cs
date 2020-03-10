@@ -7,28 +7,26 @@ using MyStage2.ViewModels;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using MyStage2.Interfaces;
 
 namespace MyStage2.Controllers
 {
     public class AnnounsmentsController : Controller
     {
-        private readonly Context _context;
+        private readonly IAnnounsmentRepository _announsmentRepository;
+        private readonly IUserRepository _userRepository;
 
-        public AnnounsmentsController(Context context)
+        public AnnounsmentsController(IAnnounsmentRepository announsmentRepository, IUserRepository userRepository)
         {
-            _context = context;
+            _announsmentRepository = announsmentRepository;
+            _userRepository = userRepository;
 
-            if (!_context.Announsment.Any()) // todo Remove
-            {
-                for (int i = 0; i < 400; i++)
+            if (!_announsmentRepository.Announsments.Any()) // todo Remove
+                for (var i = 0; i < 400; i++)
                 {
                     var announsment = TestDataGenerator.GenerateAnnounsment();
-                    _context.Announsment.Add(announsment);
+                    _announsmentRepository.CreateAnnounsment(announsment);
                 }
-
-                _context.SaveChanges();
-            }
-
         }
 
         // GET: Announsments
@@ -36,16 +34,17 @@ namespace MyStage2.Controllers
         {
             var viewModel = new AnnounsmentsVm
             {
-                Users = await _context.Users
+                Users = await _userRepository.Users
                     .Select(user => new SelectListItem(user.FirstName + " " + user.LastName, user.Id.ToString()))
                     .ToListAsync()
             };
             return View(viewModel);
         }
 
-        public async Task<IActionResult> GetAnnounsmentsJson(string searchString, int selectedUserId, DateTime? fromDate, DateTime? toDate)
+        public async Task<IActionResult> GetAnnounsmentsJson(string searchString, int selectedUserId,
+            DateTime? fromDate, DateTime? toDate)
         {
-            var announsments = _context.Announsment.Include(u => u.User).AsQueryable();
+            var announsments = _announsmentRepository.Announsments.AsQueryable();
 
             if (fromDate.HasValue) announsments = announsments.Where(a => a.CreateDate >= fromDate);
 
@@ -83,12 +82,12 @@ namespace MyStage2.Controllers
         {
             if (ids.Length == 0) return NotFound();
 
-            var entities = _context.Announsment.Where(a => ids.Contains(a.Id));
+            var entities = _announsmentRepository.Announsments.Where(a => ids.Contains(a.Id));
 
             if (!entities.Any()) return NotFound();
 
-            _context.Announsment.RemoveRange(entities);
-            await _context.SaveChangesAsync();
+            _announsmentRepository.RemoveRange(entities);
+            await _announsmentRepository.SaveChangesAsync();
 
 
             return RedirectToAction(nameof(Index));
@@ -100,9 +99,9 @@ namespace MyStage2.Controllers
         {
             if (id == null) return NotFound();
 
-            await _context.Users.LoadAsync();
+            await _userRepository.Users.LoadAsync();
 
-            var announsment = await _context.Announsment.FindAsync(id);
+            var announsment = await _announsmentRepository.Announsments.FindAsync(id);
 
 
             if (announsment == null) return NotFound();
@@ -110,7 +109,7 @@ namespace MyStage2.Controllers
             var announsmentVm = new AnnounsmentsVm
             {
                 Announsment = announsment,
-                Users = await _context.Users
+                Users = await _userRepository.Users
                     .Select(user => new SelectListItem(user.FirstName + " " + user.LastName, user.Id.ToString()))
                     .ToListAsync(),
                 SelectedUserId = announsment.User.Id
@@ -124,19 +123,15 @@ namespace MyStage2.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateAnnounsment(AnnounsmentsVm announsmentVm)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
+            if (!ModelState.IsValid) return BadRequest();
             try
             {
-                announsmentVm.Announsment.User = await _context.Users.FindAsync(announsmentVm.SelectedUserId);
-                _context.Update(announsmentVm.Announsment);
-                await _context.SaveChangesAsync();
+                announsmentVm.Announsment.User = await _userRepository.Users.FindAsync(announsmentVm.SelectedUserId);
+                _announsmentRepository.UpdateAnnounsment(announsmentVm.Announsment);
+                await _announsmentRepository.SaveChangesAsync();
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e);
                 return RedirectToAction("Index");
             }
 
@@ -147,7 +142,7 @@ namespace MyStage2.Controllers
         [HttpGet]
         public async Task<IActionResult> GetModalAddAnnounsment()
         {
-            var maxNumber = await _context.Announsment.MaxAsync(a => a.Number);
+            var maxNumber = await _announsmentRepository.Announsments.MaxAsync(a => a.Number);
 
             var announsment = new Announsment
             {
@@ -155,7 +150,7 @@ namespace MyStage2.Controllers
                 Number = maxNumber + 1
             };
 
-            var users = await _context.Users
+            var users = await _userRepository.Users
                 .Select(user => new SelectListItem(user.FirstName + " " + user.LastName, user.Id.ToString()))
                 .ToListAsync();
 
@@ -171,18 +166,14 @@ namespace MyStage2.Controllers
         [HttpPost]
         public async Task<IActionResult> AddAnnounsment(AnnounsmentsVm announsmentVm)
         {
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
+            if (!ModelState.IsValid) return BadRequest();
 
             try
             {
-                announsmentVm.Announsment.User = await _context.Users.FindAsync(announsmentVm.SelectedUserId);
+                announsmentVm.Announsment.User = await _userRepository.Users.FindAsync(announsmentVm.SelectedUserId);
 
-                await _context.Announsment.AddAsync(announsmentVm.Announsment);
-                await _context.SaveChangesAsync();
+                await _announsmentRepository.Announsments.AddAsync(announsmentVm.Announsment);
+                await _announsmentRepository.SaveChangesAsync();
             }
             catch (Exception e)
             {

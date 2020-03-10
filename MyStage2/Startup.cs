@@ -11,6 +11,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using MyStage2.Data;
+using MyStage2.Interfaces;
+using MyStage2.Models;
+using MyStage2.Repositories;
 
 namespace MyStage2
 {
@@ -38,6 +41,11 @@ namespace MyStage2
 
             services.AddDbContext<Context>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("Context")));
+
+
+            services.AddScoped<IAnnounsmentRepository, AnnounsmentRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
