@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MyStage2.Data
 {
-    public static class TestDataGenerator
+    public static class TestDataGenerator //todo Remove this class
     {
        public static Faker faker = new Faker("ru");
 

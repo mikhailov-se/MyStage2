@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using MyStage2.Data;
 using MyStage2.Models;
 using MyStage2.ViewModels;
@@ -21,7 +20,7 @@ namespace MyStage2.Controllers
             _announsmentRepository = announsmentRepository;
             _userRepository = userRepository;
 
-            if (!_announsmentRepository.Announsments.Any()) // todo Remove
+            if (!_announsmentRepository.Announsments.Any().Result) // todo Remove
                 for (var i = 0; i < 400; i++)
                 {
                     var announsment = TestDataGenerator.GenerateAnnounsment();
@@ -36,15 +35,16 @@ namespace MyStage2.Controllers
             {
                 Users = await _userRepository.Users
                     .Select(user => new SelectListItem(user.FirstName + " " + user.LastName, user.Id.ToString()))
-                    .ToListAsync()
+                    .ToList()
             };
             return View(viewModel);
         }
 
-        public async Task<IActionResult> GetAnnounsmentsJson(string searchString, int selectedUserId,
+        public async Task<ActionResult> GetAnnounsmentsJson(string searchString, int selectedUserId,
             DateTime? fromDate, DateTime? toDate)
         {
-            var announsments = _announsmentRepository.Announsments.AsQueryable();
+            var announsments = await _announsmentRepository.GetAllAnnounsmentsAsync();
+            var users = await _userRepository.GetAllUsersAsync();
 
             if (fromDate.HasValue) announsments = announsments.Where(a => a.CreateDate >= fromDate);
 
@@ -63,15 +63,20 @@ namespace MyStage2.Controllers
 
             if (selectedUserId != 0) announsments = announsments.Where(a => a.User.Id == selectedUserId);
 
-            var tableRows = await announsments.Select(announsment => new
-            {
-                id = announsment.Id,
-                number = announsment.Number,
-                createDate = announsment.CreateDate,
-                textAnnounsment = announsment.TextAnnounsment,
-                rating = announsment.Rating,
-                userName = announsment.User.FirstName + " " + announsment.User.LastName
-            }).ToListAsync();
+
+            var tableRows =  users.Join(announsments,
+                user => user,
+                announsment => announsment.User,
+                (user, announsment) => new
+                {
+                    id = announsment.Id,
+                    number = announsment.Number,
+                    createDate = announsment.CreateDate,
+                    textAnnounsment = announsment.TextAnnounsment,
+                    rating = announsment.Rating,
+                    userName = user.FirstName + " " + user.LastName
+                }
+            );
 
 
             return new JsonResult(tableRows);
@@ -84,9 +89,9 @@ namespace MyStage2.Controllers
 
             var entities = _announsmentRepository.Announsments.Where(a => ids.Contains(a.Id));
 
-            if (!entities.Any()) return NotFound();
+            if (entities == null ) return NotFound();
 
-            _announsmentRepository.RemoveRange(entities);
+            _announsmentRepository.RemoveRange(entities.ToList().Result);
             await _announsmentRepository.SaveChangesAsync();
 
 
@@ -99,9 +104,7 @@ namespace MyStage2.Controllers
         {
             if (id == null) return NotFound();
 
-            await _userRepository.Users.LoadAsync();
-
-            var announsment = await _announsmentRepository.Announsments.FindAsync(id);
+            var announsment = await _announsmentRepository.Announsments.First(a => a.Id == id);
 
 
             if (announsment == null) return NotFound();
@@ -111,7 +114,7 @@ namespace MyStage2.Controllers
                 Announsment = announsment,
                 Users = await _userRepository.Users
                     .Select(user => new SelectListItem(user.FirstName + " " + user.LastName, user.Id.ToString()))
-                    .ToListAsync(),
+                    .ToList(),
                 SelectedUserId = announsment.User.Id
             };
 
@@ -126,7 +129,7 @@ namespace MyStage2.Controllers
             if (!ModelState.IsValid) return BadRequest();
             try
             {
-                announsmentVm.Announsment.User = await _userRepository.Users.FindAsync(announsmentVm.SelectedUserId);
+                announsmentVm.Announsment.User = await _userRepository.Users.First(u=>u.Id==announsmentVm.SelectedUserId);
                 _announsmentRepository.UpdateAnnounsment(announsmentVm.Announsment);
                 await _announsmentRepository.SaveChangesAsync();
             }
@@ -142,7 +145,7 @@ namespace MyStage2.Controllers
         [HttpGet]
         public async Task<IActionResult> GetModalAddAnnounsment()
         {
-            var maxNumber = await _announsmentRepository.Announsments.MaxAsync(a => a.Number);
+            var maxNumber = await _announsmentRepository.Announsments.Max(a => a.Number);
 
             var announsment = new Announsment
             {
@@ -152,7 +155,7 @@ namespace MyStage2.Controllers
 
             var users = await _userRepository.Users
                 .Select(user => new SelectListItem(user.FirstName + " " + user.LastName, user.Id.ToString()))
-                .ToListAsync();
+                .ToList();
 
             var announsmentVm = new AnnounsmentsVm
             {
@@ -170,9 +173,8 @@ namespace MyStage2.Controllers
 
             try
             {
-                announsmentVm.Announsment.User = await _userRepository.Users.FindAsync(announsmentVm.SelectedUserId);
-
-                await _announsmentRepository.Announsments.AddAsync(announsmentVm.Announsment);
+                announsmentVm.Announsment.User = await _userRepository.Users.First(u => u.Id == announsmentVm.SelectedUserId);
+                _announsmentRepository.CreateAnnounsment(announsmentVm.Announsment);
                 await _announsmentRepository.SaveChangesAsync();
             }
             catch (Exception e)

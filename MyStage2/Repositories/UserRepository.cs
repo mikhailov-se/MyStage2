@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Extensions.Internal;
 using MyStage2.Interfaces;
 using MyStage2.Models;
 using MyStage2.Data;
@@ -16,7 +18,17 @@ namespace MyStage2.Repositories
             _context = context;
         }
 
-        public DbSet<User> Users => _context.Users;
+        public IAsyncEnumerable<User> Users => _context.Users.AsAsyncEnumerable();
+
+        public IEnumerable<User> GetAllUsers()
+        {
+            return _context.Users.ToList();
+        }
+
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        {
+            return await _context.Users.ToListAsync();
+        }
 
         public User GetUser(int id)
         {

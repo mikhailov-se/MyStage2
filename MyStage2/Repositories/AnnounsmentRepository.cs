@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MyStage2.Data;
@@ -9,7 +10,6 @@ namespace MyStage2.Repositories
 {
     public class AnnounsmentRepository : IAnnounsmentRepository
     {
-
         private readonly Context _context;
 
         public AnnounsmentRepository(Context context)
@@ -17,7 +17,7 @@ namespace MyStage2.Repositories
             _context = context;
         }
 
-        public DbSet<Announsment> Announsments => _context.Announsment;
+        public IAsyncEnumerable<Announsment> Announsments => _context.Announsment.ToAsyncEnumerable();
 
         public Announsment GetAnnounsment(int id)
         {
@@ -53,6 +53,16 @@ namespace MyStage2.Repositories
         public async Task<int> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync();
+        }
+
+        public IEnumerable<Announsment> GetAllAnnounsments()
+        {
+            return _context.Announsment.ToList();
+        }
+
+        public async Task<IEnumerable<Announsment>> GetAllAnnounsmentsAsync()
+        {
+            return await _context.Announsment.ToListAsync();
         }
     }
 }
