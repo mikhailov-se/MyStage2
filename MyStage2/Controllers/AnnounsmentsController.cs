@@ -25,8 +25,13 @@ namespace MyStage2.Controllers
                 {
                     var announsment = TestDataGenerator.GenerateAnnounsment();
                     _announsmentRepository.CreateAnnounsment(announsment);
+
                 }
+
+            _announsmentRepository.SaveChanges();
         }
+
+
 
         // GET: Announsments
         public async Task<IActionResult> Index()
@@ -40,7 +45,9 @@ namespace MyStage2.Controllers
             return View(viewModel);
         }
 
-        public async Task<ActionResult> GetAnnounsmentsJson(string searchString, int selectedUserId,
+
+
+        public async Task<ActionResult> GetAnnounsmentsJson(string searchString, int? selectedUserId,
             DateTime? fromDate, DateTime? toDate)
         {
             var announsments = await _announsmentRepository.GetAllAnnounsmentsAsync();
@@ -61,7 +68,7 @@ namespace MyStage2.Controllers
                         u.Rating.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase)
                     );
 
-            if (selectedUserId != 0) announsments = announsments.Where(a => a.User.Id == selectedUserId);
+            if (selectedUserId !=null) announsments = announsments.Where(a => a.User.Id == selectedUserId);
 
 
             var tableRows =  users.Join(announsments,
@@ -71,7 +78,7 @@ namespace MyStage2.Controllers
                 {
                     id = announsment.Id,
                     number = announsment.Number,
-                    createDate = announsment.CreateDate,
+                    createDate = announsment.CreateDate.ToShortDateString(),
                     textAnnounsment = announsment.TextAnnounsment,
                     rating = announsment.Rating,
                     userName = user.FirstName + " " + user.LastName
@@ -79,8 +86,10 @@ namespace MyStage2.Controllers
             );
 
 
-            return new JsonResult(tableRows);
+            return  new JsonResult(tableRows);
         }
+
+
 
         [HttpPost]
         public async Task<IActionResult> Delete(int[] ids)
@@ -97,6 +106,9 @@ namespace MyStage2.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+
+
 
 
         [HttpGet]
@@ -123,6 +135,9 @@ namespace MyStage2.Controllers
         }
 
 
+
+
+
         [HttpPost]
         public async Task<IActionResult> UpdateAnnounsment(AnnounsmentsVm announsmentVm)
         {
@@ -142,8 +157,11 @@ namespace MyStage2.Controllers
         }
 
 
+
+
+
         [HttpGet]
-        public async Task<IActionResult> GetModalAddAnnounsment()
+        public async Task<PartialViewResult> GetModalAddAnnounsment()
         {
             var maxNumber = await _announsmentRepository.Announsments.Max(a => a.Number);
 
@@ -164,6 +182,9 @@ namespace MyStage2.Controllers
             };
             return PartialView("AddAnnounsmentModalPartial", announsmentVm);
         }
+
+
+
 
 
         [HttpPost]

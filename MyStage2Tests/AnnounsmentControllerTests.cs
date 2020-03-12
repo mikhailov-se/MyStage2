@@ -15,7 +15,7 @@ namespace MyStage2Tests
     public class AnnounsmentControllerTests
     {
         [Fact]
-        public async Task IndexReturnsAViewResultWithAListOfUsers()
+        public async Task IndexTest()
         {
             // Arrange
             var mockAnnounsment = new Mock<IAnnounsmentRepository>();
@@ -38,6 +38,55 @@ namespace MyStage2Tests
             var model = Assert.IsAssignableFrom<AnnounsmentsVm>(viewResult.Model);
 
             Assert.Equal(GetTestUsers().Count().Result, model.Users.Count());
+        }
+
+        [Fact]
+        public async Task GetListAnnounsmentsJsonTest()
+        {
+            // Arrange
+            var mockAnnounsment = new Mock<IAnnounsmentRepository>();
+            var mockUser = new Mock<IUserRepository>();
+
+
+            mockAnnounsment.Setup(repo => repo.Announsments).Returns(GetTestAnnounsments());
+            mockUser.Setup(repo => repo.Users).Returns(GetTestUsers);
+
+            var controller = new AnnounsmentsController(mockAnnounsment.Object, mockUser.Object);
+
+            // Act
+
+            var result = await controller.GetAnnounsmentsJson(null, null, null, null) as JsonResult;
+
+            //Assert
+
+            Assert.IsType<JsonResult>(result);
+        }
+
+
+        [Fact]
+        public async Task RemoveAnnounsmentTest()
+        {
+            // Arrange
+
+            var mockAnnounsment = new Mock<IAnnounsmentRepository>();
+            var mockUser = new Mock<IUserRepository>();
+
+
+            mockAnnounsment.Setup(repo => repo.Announsments).Returns(GetTestAnnounsments());
+            mockUser.Setup(repo => repo.Users).Returns(GetTestUsers);
+            var controller = new AnnounsmentsController(mockAnnounsment.Object, mockUser.Object);
+
+
+            var removingAnnounsment = mockAnnounsment.Object.Announsments.First().Result;
+
+            // Act
+
+            var result = await controller.Delete(new[] {removingAnnounsment.Id});
+
+            //Assert
+
+            Assert.IsNotType<BadRequestResult>(result);
+            Assert.IsType<RedirectToActionResult>(result);
         }
 
 
@@ -81,9 +130,9 @@ namespace MyStage2Tests
         [Fact]
         public async Task UpdateAnnounsmentTest()
         {
-           // Arrange
+            // Arrange
 
-           var mockAnnounsment = new Mock<IAnnounsmentRepository>();
+            var mockAnnounsment = new Mock<IAnnounsmentRepository>();
             var mockUser = new Mock<IUserRepository>();
 
 
@@ -96,8 +145,7 @@ namespace MyStage2Tests
             var announsment = mockAnnounsment.Object.Announsments.First().Result;
 
 
-
-           // Act
+            // Act
             announsment.TextAnnounsment = "Changed announsment text";
 
             var result = await controller.UpdateAnnounsment(new AnnounsmentsVm
@@ -106,15 +154,21 @@ namespace MyStage2Tests
             });
 
 
+            var announsmentSuccesfullyUpdated = mockAnnounsment.Object.Announsments.Any(a =>
+                a.TextAnnounsment == "Changed announsment text").Result;
+
+
             //Assert
 
             Assert.IsNotType<BadRequestResult>(result);
             Assert.IsType<RedirectToActionResult>(result);
 
+            Assert.True(announsmentSuccesfullyUpdated);
         }
 
+
         [Fact]
-        public async Task RemoveAnnounsmentTest()
+        public void GetModalWindowAddAnnounsmentTest()
         {
             // Arrange
 
@@ -124,22 +178,45 @@ namespace MyStage2Tests
 
             mockAnnounsment.Setup(repo => repo.Announsments).Returns(GetTestAnnounsments());
             mockUser.Setup(repo => repo.Users).Returns(GetTestUsers);
+
             var controller = new AnnounsmentsController(mockAnnounsment.Object, mockUser.Object);
 
+            //Act
 
-            var announsment = mockAnnounsment.Object.Announsments.First().Result;
+            var result = controller.GetModalAddAnnounsment();
 
-            // Act
+            // Assert
+            var viewResult = Assert.IsType<PartialViewResult>(result.Result);
 
-            var result = await controller.Delete(new[] { announsment.Id });
-
-            //Assert
-
-            Assert.IsNotType<BadRequestResult>(result);
-            Assert.IsType<RedirectToActionResult>(result);
+            var model = Assert.IsAssignableFrom<AnnounsmentsVm>(viewResult.Model);
+            Assert.Equal(GetTestUsers().Count().Result, model.Users.Count());
         }
 
+        [Fact]
+        public void GetModalEditWindowAnnounsmentTest()
+        {
+            // Arrange
 
+            var mockAnnounsment = new Mock<IAnnounsmentRepository>();
+            var mockUser = new Mock<IUserRepository>();
+
+
+            mockAnnounsment.Setup(repo => repo.Announsments).Returns(GetTestAnnounsments());
+            mockUser.Setup(repo => repo.Users).Returns(GetTestUsers);
+
+            var editAnnounsment = mockAnnounsment.Object.Announsments.FirstOrDefault();
+
+            var controller = new AnnounsmentsController(mockAnnounsment.Object, mockUser.Object);
+
+            //Act
+
+            var result = controller.GetModalEditAnnounsment(editAnnounsment.Id);
+
+            // Assert
+            var viewResult = Assert.IsType<PartialViewResult>(result.Result);
+
+            Assert.IsType<AnnounsmentsVm>(viewResult.Model);
+        }
 
 
         private IAsyncEnumerable<User> GetTestUsers()
@@ -154,7 +231,6 @@ namespace MyStage2Tests
 
             return users.ToAsyncEnumerable();
         }
-
 
 
         private IAsyncEnumerable<Announsment> GetTestAnnounsments()
@@ -179,7 +255,5 @@ namespace MyStage2Tests
 
             return announsments.ToAsyncEnumerable();
         }
-
-
     }
 }
